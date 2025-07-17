@@ -1,5 +1,5 @@
 // =========================================
-// TWITTER OAUTH 1.0a - VERSÃO ATUALIZADA
+// TWITTER OAUTH 1.0a - ENGLISH VERSION
 // =========================================
 
 const express = require('express');
@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // =========================================
-// CONFIGURAÇÃO OTIMIZADA PARA VERCEL
+// VERCEL OPTIMIZED CONFIGURATION
 // =========================================
 
 app.set('trust proxy', 1);
@@ -40,7 +40,7 @@ app.use(session({
 }));
 
 // =========================================
-// FUNÇÕES UTILITÁRIAS
+// UTILITY FUNCTIONS
 // =========================================
 
 function getCallbackUrl(req) {
@@ -61,77 +61,77 @@ function createOAuth(callbackUrl) {
   );
 }
 
-function verificarCredenciais(req, res, next) {
-  const credenciais = [
+function verifyCredentials(req, res, next) {
+  const credentials = [
     'TWITTER_API_KEY',
     'TWITTER_API_SECRET',
     'TWITTER_ACCESS_TOKEN',
     'TWITTER_ACCESS_TOKEN_SECRET'
   ];
 
-  for (const cred of credenciais) {
+  for (const cred of credentials) {
     if (!process.env[cred]) {
       return res.status(500).send(`
-        <h1>❌ Erro de Configuração</h1>
-        <p>Variável de ambiente <strong>${cred}</strong> não configurada.</p>
-        <p>Configure todas as variáveis na Vercel e faça novo deploy.</p>
+        <h1>❌ Configuration Error</h1>
+        <p>Environment variable <strong>${cred}</strong> not configured.</p>
+        <p>Configure all variables in Vercel and redeploy.</p>
       `);
     }
   }
   next();
 }
 
-// Função para mascarar tokens (segurança)
-function mascarToken(token) {
+// Function to mask tokens (security)
+function maskToken(token) {
   if (!token) return 'N/A';
   if (token.length <= 8) return token;
   
-  const inicio = token.substring(0, 4);
-  const fim = token.substring(token.length - 4);
-  const meio = '*'.repeat(Math.max(0, token.length - 8));
+  const start = token.substring(0, 4);
+  const end = token.substring(token.length - 4);
+  const middle = '*'.repeat(Math.max(0, token.length - 8));
   
-  return `${inicio}${meio}${fim}`;
+  return `${start}${middle}${end}`;
 }
 
-// Função para obter permissões do usuário
-function obterPermissoes(user) {
-  const permissoes = [];
+// Function to get user permissions
+function getPermissions(user) {
+  const permissions = [];
   
-  // Baseado no que o OAuth 1.0a permite
-  permissoes.push('✅ Ler tweets da timeline');
-  permissoes.push('✅ Ver informações do perfil');
-  permissoes.push('✅ Ver contas seguidas e seguidores');
+  // Based on what OAuth 1.0a allows
+  permissions.push('✅ Read timeline tweets');
+  permissions.push('✅ View profile information');
+  permissions.push('✅ View followed accounts and followers');
   
-  // Verificar se tem permissão de escrita
+  // Check if has write permission
   if (user.status && user.status.text) {
-    permissoes.push('✅ Publicar tweets');
+    permissions.push('✅ Post tweets');
   }
   
-  // Verificar outras permissões baseadas no perfil
+  // Check other permissions based on profile
   if (user.profile_image_url) {
-    permissoes.push('✅ Acessar foto do perfil');
+    permissions.push('✅ Access profile picture');
   }
   
   if (user.location) {
-    permissoes.push('✅ Acessar localização do perfil');
+    permissions.push('✅ Access profile location');
   }
   
   if (user.email) {
-    permissoes.push('✅ Acessar email da conta');
+    permissions.push('✅ Access account email');
   }
   
-  return permissoes;
+  return permissions;
 }
 
 // =========================================
-// ROTAS
+// ROUTES
 // =========================================
 
-// Página inicial
+// Homepage
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -220,22 +220,22 @@ app.get('/', (req, res) => {
       </head>
       <body>
         <div class="container">
-          <h1>🐦 Twitter OAuth na Vercel</h1>
+          <h1>🐦 Twitter OAuth on Vercel</h1>
           
           ${req.session.user ? `
             <div class="user-info">
-              <img src="${req.session.user.profile_image_url_https}" alt="Foto do perfil" class="profile-img">
-              <h2>Bem-vindo, ${req.session.user.name}! 👋</h2>
+              <img src="${req.session.user.profile_image_url_https}" alt="Profile picture" class="profile-img">
+              <h2>Welcome, ${req.session.user.name}! 👋</h2>
               <p><strong>@${req.session.user.screen_name}</strong></p>
               
               <div class="stats">
                 <div class="stat">
                   <div class="stat-number">${req.session.user.followers_count.toLocaleString()}</div>
-                  <div class="stat-label">Seguidores</div>
+                  <div class="stat-label">Followers</div>
                 </div>
                 <div class="stat">
                   <div class="stat-number">${req.session.user.friends_count.toLocaleString()}</div>
-                  <div class="stat-label">Seguindo</div>
+                  <div class="stat-label">Following</div>
                 </div>
                 <div class="stat">
                   <div class="stat-number">${req.session.user.statuses_count.toLocaleString()}</div>
@@ -244,32 +244,32 @@ app.get('/', (req, res) => {
               </div>
             </div>
             
-            <button onclick="location.href='/tweet'">✍️ Fazer Tweet</button>
-            <button onclick="location.href='/permissions'">🔐 Ver Permissões</button>
+            <button onclick="location.href='/tweet'">✍️ Post Tweet</button>
+            <button onclick="location.href='/permissions'">🔐 View Permissions</button>
             <button onclick="location.href='/logout'" class="logout-btn">🚪 Logout</button>
             
           ` : `
             <p style="margin: 20px 0; font-size: 18px;">
-              Faça login com sua conta do Twitter para continuar
+              Sign in with your Twitter account to continue
             </p>
             <button onclick="location.href='/auth/twitter'">
-              🔑 Login com Twitter
+              🔑 Login with Twitter
             </button>
             
             <div class="direct-login">
-              <h3>🚀 Login Direto</h3>
-              <p>Ou use este endpoint para ir direto ao Twitter:</p>
+              <h3>🚀 Direct Login</h3>
+              <p>Or use this endpoint to go directly to Twitter:</p>
               <div class="endpoint-info">
                 GET /login
               </div>
               <button onclick="location.href='/login'">
-                ⚡ Login Direto
+                ⚡ Direct Login
               </button>
             </div>
           `}
           
           <div class="powered-by">
-            🚀 Hospedado na Vercel | 💻 Feito com Node.js
+            🚀 Hosted on Vercel | 💻 Built with Node.js
           </div>
         </div>
       </body>
@@ -278,21 +278,21 @@ app.get('/', (req, res) => {
 });
 
 // =========================================
-// ENDPOINT DE LOGIN DIRETO (NOVO!)
+// DIRECT LOGIN ENDPOINT (NEW!)
 // =========================================
 
-app.get('/login', verificarCredenciais, (req, res) => {
+app.get('/login', verifyCredentials, (req, res) => {
   const callbackUrl = getCallbackUrl(req);
   const oauth = createOAuth(callbackUrl);
   
   oauth.getOAuthRequestToken((error, oauthToken, oauthTokenSecret, results) => {
     if (error) {
-      console.error('Erro ao obter request token:', error);
+      console.error('Error getting request token:', error);
       return res.status(500).send(`
-        <h1>❌ Erro na Autenticação</h1>
-        <p>Não foi possível conectar com o Twitter.</p>
-        <p>Verifique suas credenciais e tente novamente.</p>
-        <button onclick="location.href='/'">Tentar Novamente</button>
+        <h1>❌ Authentication Error</h1>
+        <p>Could not connect to Twitter.</p>
+        <p>Please check your credentials and try again.</p>
+        <button onclick="location.href='/'">Try Again</button>
       `);
     }
 
@@ -300,24 +300,24 @@ app.get('/login', verificarCredenciais, (req, res) => {
     req.session.oauthRequestTokenSecret = oauthTokenSecret;
     req.session.callbackUrl = callbackUrl;
 
-    // REDIRECT DIRETO PARA O TWITTER (sem página intermediária)
+    // DIRECT REDIRECT TO TWITTER (no intermediate page)
     res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${oauthToken}`);
   });
 });
 
-// Iniciar autenticação (rota antiga mantida para compatibilidade)
-app.get('/auth/twitter', verificarCredenciais, (req, res) => {
+// Start authentication (old route kept for compatibility)
+app.get('/auth/twitter', verifyCredentials, (req, res) => {
   const callbackUrl = getCallbackUrl(req);
   const oauth = createOAuth(callbackUrl);
   
   oauth.getOAuthRequestToken((error, oauthToken, oauthTokenSecret, results) => {
     if (error) {
-      console.error('Erro ao obter request token:', error);
+      console.error('Error getting request token:', error);
       return res.status(500).send(`
-        <h1>❌ Erro na Autenticação</h1>
-        <p>Não foi possível conectar com o Twitter.</p>
-        <p>Verifique suas credenciais e tente novamente.</p>
-        <button onclick="location.href='/'">Tentar Novamente</button>
+        <h1>❌ Authentication Error</h1>
+        <p>Could not connect to Twitter.</p>
+        <p>Please check your credentials and try again.</p>
+        <button onclick="location.href='/'">Try Again</button>
       `);
     }
 
@@ -330,7 +330,7 @@ app.get('/auth/twitter', verificarCredenciais, (req, res) => {
 });
 
 // =========================================
-// CALLBACK ATUALIZADO COM PERMISSÕES
+// UPDATED CALLBACK WITH PERMISSIONS
 // =========================================
 
 app.get('/auth/twitter/callback', (req, res) => {
@@ -338,9 +338,9 @@ app.get('/auth/twitter/callback', (req, res) => {
 
   if (!oauth_token || !oauth_verifier) {
     return res.status(400).send(`
-      <h1>❌ Erro no Callback</h1>
-      <p>Parâmetros de autorização inválidos.</p>
-      <button onclick="location.href='/'">Tentar Novamente</button>
+      <h1>❌ Callback Error</h1>
+      <p>Invalid authorization parameters.</p>
+      <button onclick="location.href='/'">Try Again</button>
     `);
   }
 
@@ -353,11 +353,11 @@ app.get('/auth/twitter/callback', (req, res) => {
     oauth_verifier,
     (error, oauthAccessToken, oauthAccessTokenSecret, results) => {
       if (error) {
-        console.error('Erro ao obter access token:', error);
+        console.error('Error getting access token:', error);
         return res.status(500).send(`
-          <h1>❌ Erro na Autenticação</h1>
-          <p>Não foi possível completar o login.</p>
-          <button onclick="location.href='/'">Tentar Novamente</button>
+          <h1>❌ Authentication Error</h1>
+          <p>Could not complete login.</p>
+          <button onclick="location.href='/'">Try Again</button>
         `);
       }
 
@@ -370,39 +370,39 @@ app.get('/auth/twitter/callback', (req, res) => {
         oauthAccessTokenSecret,
         (error, data, response) => {
           if (error) {
-            console.error('Erro ao obter dados do usuário:', error);
+            console.error('Error getting user data:', error);
             return res.status(500).send(`
-              <h1>❌ Erro ao Carregar Perfil</h1>
-              <p>Login realizado, mas não foi possível carregar os dados.</p>
-              <button onclick="location.href='/'">Tentar Novamente</button>
+              <h1>❌ Profile Loading Error</h1>
+              <p>Login successful, but could not load profile data.</p>
+              <button onclick="location.href='/'">Try Again</button>
             `);
           }
 
           const userData = JSON.parse(data);
           req.session.user = userData;
           
-          // Salvar dados extras da sessão
+          // Save extra session data
           req.session.authData = {
             oauth_token: oauth_token,
             oauth_verifier: oauth_verifier,
             timestamp: new Date().toISOString()
           };
 
-          // Limpar tokens temporários
+          // Clean up temporary tokens
           delete req.session.oauthRequestToken;
           delete req.session.oauthRequestTokenSecret;
           delete req.session.callbackUrl;
 
-          // PÁGINA DE SUCESSO COM PERMISSÕES E TOKENS
-          const permissoes = obterPermissoes(userData);
+          // SUCCESS PAGE WITH PERMISSIONS AND TOKENS
+          const permissions = getPermissions(userData);
           
           res.send(`
             <!DOCTYPE html>
-            <html lang="pt-BR">
+            <html lang="en">
               <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>🎉 Autorização Concedida!</title>
+                <title>🎉 Authorization Granted!</title>
                 <style>
                   * { margin: 0; padding: 0; box-sizing: border-box; }
                   body { 
@@ -518,65 +518,65 @@ app.get('/auth/twitter/callback', (req, res) => {
               </head>
               <body>
                 <div class="container">
-                  <h1>🎉 Autorização Concedida com Sucesso!</h1>
+                  <h1>🎉 Authorization Granted Successfully!</h1>
                   
                   <div class="success-badge">
-                    <h2>✅ Login realizado com sucesso!</h2>
-                    <p>Você autorizou nossa aplicação a acessar sua conta do Twitter.</p>
+                    <h2>✅ Login successful!</h2>
+                    <p>You have authorized our application to access your Twitter account.</p>
                   </div>
                   
                   <div class="user-info">
-                    <img src="${userData.profile_image_url_https}" alt="Foto do perfil" class="profile-img">
+                    <img src="${userData.profile_image_url_https}" alt="Profile picture" class="profile-img">
                     <div>
                       <h3>${userData.name}</h3>
                       <p><strong>@${userData.screen_name}</strong></p>
-                      <p>Conta criada em: ${new Date(userData.created_at).toLocaleDateString('pt-BR')}</p>
+                      <p>Account created on: ${new Date(userData.created_at).toLocaleDateString('en-US')}</p>
                     </div>
                   </div>
                   
                   <div class="permissions-section">
-                    <h3>🔐 Permissões Concedidas</h3>
-                    <p>Sua aplicação agora tem acesso às seguintes funcionalidades:</p>
+                    <h3>🔐 Granted Permissions</h3>
+                    <p>Your application now has access to the following features:</p>
                     <ul class="permissions-list">
-                      ${permissoes.map(permissao => `<li>${permissao}</li>`).join('')}
+                      ${permissions.map(permission => `<li>${permission}</li>`).join('')}
                     </ul>
                   </div>
                   
                   <div class="tokens-section">
-                    <h3>🔑 Tokens de Acesso</h3>
+                    <h3>🔑 Access Tokens</h3>
                     <div class="warning">
-                      <strong>⚠️ Importante:</strong> Estes tokens são sensíveis e devem ser mantidos em segurança.
+                      <strong>⚠️ Important:</strong> These tokens are sensitive and should be kept secure.
                     </div>
                     
                     <div class="token-item">
                       <div class="token-label">OAuth Token:</div>
-                      <div class="token-value">${mascarToken(oauth_token)}</div>
+                      <div class="token-value">${maskToken(oauth_token)}</div>
                     </div>
                     
                     <div class="token-item">
                       <div class="token-label">OAuth Verifier:</div>
-                      <div class="token-value">${mascarToken(oauth_verifier)}</div>
+                      <div class="token-value">${maskToken(oauth_verifier)}</div>
                     </div>
                     
                     <div class="token-item">
                       <div class="token-label">Access Token:</div>
-                      <div class="token-value">${mascarToken(oauthAccessToken)}</div>
+                      <div class="token-value">${maskToken(oauthAccessToken)}</div>
                     </div>
                     
                     <div class="token-item">
                       <div class="token-label">Access Token Secret:</div>
-                      <div class="token-value">${mascarToken(oauthAccessTokenSecret)}</div>
+                      <div class="token-value">${maskToken(oauthAccessTokenSecret)}</div>
                     </div>
                     
                     <div class="token-item">
-                      <div class="token-label">Autorização realizada em:</div>
-                      <div class="token-value">${new Date().toLocaleString('pt-BR')}</div>
+                      <div class="token-label">Authorization completed at:</div>
+                      <div class="token-value">${new Date().toLocaleString('en-US')}</div>
                     </div>
                   </div>
                   
                   <div class="button-container">
-                    <button onclick="location.href='/'">🏠 Ir para Aplicação</button>
-                    <button onclick="location.href='/permissions'">📋 Ver Detalhes Completos</button>
+                    <button onclick="location.href='/'">🏠 Go to Application</button>
+                    <button onclick="location.href='/permissions'">📋 View Full Details</button>
                   </div>
                 </div>
               </body>
@@ -589,7 +589,7 @@ app.get('/auth/twitter/callback', (req, res) => {
 });
 
 // =========================================
-// PÁGINA DE PERMISSÕES DETALHADAS
+// DETAILED PERMISSIONS PAGE
 // =========================================
 
 app.get('/permissions', (req, res) => {
@@ -599,15 +599,15 @@ app.get('/permissions', (req, res) => {
 
   const user = req.session.user;
   const authData = req.session.authData;
-  const permissoes = obterPermissoes(user);
+  const permissions = getPermissions(user);
 
   res.send(`
     <!DOCTYPE html>
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>🔐 Permissões e Tokens</title>
+        <title>🔐 Permissions and Tokens</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
@@ -701,89 +701,76 @@ app.get('/permissions', (req, res) => {
       </head>
       <body>
         <div class="container">
-          <h1>🔐 Permissões e Tokens Detalhados</h1>
+          <h1>🔐 Detailed Permissions and Tokens</h1>
           
           <div class="section">
-            <h2>👤 Informações do Usuário</h2>
+            <h2>👤 User Information</h2>
             <div class="grid">
               <div class="card">
-                <h3>Dados Básicos</h3>
-                <p><strong>Nome:</strong> ${user.name}</p>
+                <h3>Basic Data</h3>
+                <p><strong>Name:</strong> ${user.name}</p>
                 <p><strong>Username:</strong> @${user.screen_name}</p>
                 <p><strong>ID:</strong> ${user.id}</p>
-                <p><strong>Verificado:</strong> ${user.verified ? '✅ Sim' : '❌ Não'}</p>
+                <p><strong>Verified:</strong> ${user.verified ? '✅ Yes' : '❌ No'}</p>
               </div>
               
               <div class="card">
-                <h3>Estatísticas</h3>
-                <p><strong>Seguidores:</strong> ${user.followers_count.toLocaleString()}</p>
-                <p><strong>Seguindo:</strong> ${user.friends_count.toLocaleString()}</p>
+                <h3>Statistics</h3>
+                <p><strong>Followers:</strong> ${user.followers_count.toLocaleString()}</p>
+                <p><strong>Following:</strong> ${user.friends_count.toLocaleString()}</p>
                 <p><strong>Tweets:</strong> ${user.statuses_count.toLocaleString()}</p>
-                <p><strong>Curtidas:</strong> ${user.favourites_count.toLocaleString()}</p>
+                <p><strong>Likes:</strong> ${user.favourites_count.toLocaleString()}</p>
               </div>
               
               <div class="card">
-                <h3>Informações da Conta</h3>
-                <p><strong>Criada em:</strong> ${new Date(user.created_at).toLocaleDateString('pt-BR')}</p>
-                <p><strong>Localização:</strong> ${user.location || 'Não informado'}</p>
-                <p><strong>Timezone:</strong> ${user.time_zone || 'Não informado'}</p>
-                <p><strong>Idioma:</strong> ${user.lang || 'Não informado'}</p>
+                <h3>Account Information</h3>
+                <p><strong>Created on:</strong> ${new Date(user.created_at).toLocaleDateString('en-US')}</p>
+                <p><strong>Location:</strong> ${user.location || 'Not specified'}</p>
+                <p><strong>Timezone:</strong> ${user.time_zone || 'Not specified'}</p>
+                <p><strong>Language:</strong> ${user.lang || 'Not specified'}</p>
               </div>
             </div>
           </div>
           
           <div class="section">
-            <h2>🔐 Permissões Concedidas</h2>
+            <h2>🔐 Granted Permissions</h2>
             <ul class="permissions-list">
-              ${permissoes.map(permissao => `<li>${permissao}</li>`).join('')}
+              ${permissions.map(permission => `<li>${permission}</li>`).join('')}
             </ul>
           </div>
           
           <div class="section">
-            <h2>🔑 Tokens de Acesso</h2>
+            <h2>🔑 Access Tokens</h2>
             <div class="warning">
-              <strong>⚠️ Segurança:</strong> Estes tokens permitem acesso à sua conta. Mantenha-os seguros!
+              <strong>⚠️ Security:</strong> These tokens allow access to your account. Keep them secure!
             </div>
             
             <div class="grid">
               <div class="card">
                 <h3>OAuth Token</h3>
-                <div class="token-full">${req.session.oauthAccessToken || 'Token não disponível'}</div>
+                <div class="token-full">${req.session.oauthAccessToken || 'Token not available'}</div>
               </div>
               
               <div class="card">
                 <h3>OAuth Token Secret</h3>
-                <div class="token-full">${req.session.oauthAccessTokenSecret || 'Token secret não disponível'}</div>
+                <div class="token-full">${req.session.oauthAccessTokenSecret || 'Token secret not available'}</div>
               </div>
               
               ${authData ? `
                 <div class="card">
-                  <h3>Dados da Autorização</h3>
+                  <h3>Authorization Data</h3>
                   <p><strong>OAuth Token:</strong></p>
                   <div class="token-full">${authData.oauth_token}</div>
                   <p><strong>OAuth Verifier:</strong></p>
                   <div class="token-full">${authData.oauth_verifier}</div>
-                  <p><strong>Autorizado em:</strong> ${new Date(authData.timestamp).toLocaleString('pt-BR')}</p>
+                  <p><strong>Authorized on:</strong> ${new Date(authData.timestamp).toLocaleString('en-US')}</p>
                 </div>
               ` : ''}
             </div>
           </div>
           
-          <div class="section">
-            <h2>🔗 Endpoints da API</h2>
-            <div class="card">
-              <h3>URLs Importantes</h3>
-              <p><strong>Login Direto:</strong> <code>/login</code></p>
-              <p><strong>Autorização:</strong> <code>/auth/twitter</code></p>
-              <p><strong>Callback:</strong> <code>/auth/twitter/callback</code></p>
-              <p><strong>Permissões:</strong> <code>/permissions</code></p>
-              <p><strong>Fazer Tweet:</strong> <code>/tweet</code></p>
-            </div>
-          </div>
-          
           <div class="button-container">
-            <button onclick="location.href='/'">🏠 Voltar ao Início</button>
-            <button onclick="location.href='/tweet'">✍️ Fazer Tweet</button>
+            <button onclick="location.href='/'">🏠 Back to Home</button>
             <button onclick="location.href='/logout'">🚪 Logout</button>
           </div>
         </div>
@@ -793,10 +780,10 @@ app.get('/permissions', (req, res) => {
 });
 
 // =========================================
-// OUTRAS ROTAS (mantidas iguais)
+// OTHER ROUTES (maintained the same)
 // =========================================
 
-// Página de tweet
+// Tweet page
 app.get('/tweet', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/');
@@ -804,11 +791,11 @@ app.get('/tweet', (req, res) => {
 
   res.send(`
     <!DOCTYPE html>
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Fazer Tweet</title>
+        <title>Post Tweet</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
@@ -882,29 +869,29 @@ app.get('/tweet', (req, res) => {
       </head>
       <body>
         <div class="container">
-          <h1>✍️ Fazer Tweet</h1>
+          <h1>✍️ Post Tweet</h1>
           
           <div class="user-info">
-            <strong>Logado como:</strong> @${req.session.user.screen_name}
+            <strong>Logged in as:</strong> @${req.session.user.screen_name}
           </div>
           
           <form method="POST" action="/tweet">
             <textarea 
               name="status" 
-              placeholder="O que está acontecendo? 🤔" 
+              placeholder="What's happening? 🤔" 
               maxlength="280" 
               required
               oninput="updateCharCount(this)"
             ></textarea>
             
             <div class="char-count">
-              <span id="charCount">0</span>/280 caracteres
+              <span id="charCount">0</span>/280 characters
             </div>
             
             <div class="button-container">
-              <button type="submit" id="tweetBtn">🐦 Tweetar</button>
+              <button type="submit" id="tweetBtn">🐦 Tweet</button>
               <button type="button" class="back-btn" onclick="location.href='/'">
-                ⬅️ Voltar
+                ⬅️ Back
               </button>
             </div>
           </form>
@@ -938,7 +925,7 @@ app.get('/tweet', (req, res) => {
   `);
 });
 
-// Processar tweet
+// Process tweet
 app.post('/tweet', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/');
@@ -948,17 +935,17 @@ app.post('/tweet', (req, res) => {
 
   if (!status || status.trim().length === 0) {
     return res.status(400).send(`
-      <h1>❌ Erro</h1>
-      <p>Tweet não pode estar vazio!</p>
-      <button onclick="history.back()">Voltar</button>
+      <h1>❌ Error</h1>
+      <p>Tweet cannot be empty!</p>
+      <button onclick="history.back()">Back</button>
     `);
   }
 
   if (status.length > 280) {
     return res.status(400).send(`
-      <h1>❌ Erro</h1>
-      <p>Tweet muito longo! Máximo 280 caracteres.</p>
-      <button onclick="history.back()">Voltar</button>
+      <h1>❌ Error</h1>
+      <p>Tweet too long! Maximum 280 characters.</p>
+      <button onclick="history.back()">Back</button>
     `);
   }
 
@@ -972,11 +959,11 @@ app.post('/tweet', (req, res) => {
     { status: status },
     (error, data, response) => {
       if (error) {
-        console.error('Erro ao fazer tweet:', error);
+        console.error('Error posting tweet:', error);
         return res.status(500).send(`
-          <h1>❌ Erro ao Tweetar</h1>
-          <p>Não foi possível publicar o tweet. Tente novamente.</p>
-          <button onclick="history.back()">Tentar Novamente</button>
+          <h1>❌ Tweet Error</h1>
+          <p>Could not post tweet. Please try again.</p>
+          <button onclick="history.back()">Try Again</button>
         `);
       }
 
@@ -984,11 +971,11 @@ app.post('/tweet', (req, res) => {
       
       res.send(`
         <!DOCTYPE html>
-        <html lang="pt-BR">
+        <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Tweet Enviado!</title>
+            <title>Tweet Posted!</title>
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body { 
@@ -1054,25 +1041,25 @@ app.post('/tweet', (req, res) => {
           </head>
           <body>
             <div class="container">
-              <h1>🎉 Tweet Enviado com Sucesso!</h1>
+              <h1>🎉 Tweet Posted Successfully!</h1>
               
               <div class="success">
-                <h3>✅ Seu tweet foi publicado!</h3>
+                <h3>✅ Your tweet has been published!</h3>
                 <div class="tweet-content">
                   "${tweetData.text}"
                 </div>
-                <p><strong>Publicado em:</strong> ${new Date(tweetData.created_at).toLocaleString('pt-BR')}</p>
+                <p><strong>Posted on:</strong> ${new Date(tweetData.created_at).toLocaleString('en-US')}</p>
               </div>
               
               <a href="https://twitter.com/${tweetData.user.screen_name}/status/${tweetData.id_str}" 
                  target="_blank" 
                  class="twitter-link">
-                🔗 Ver no Twitter
+                🔗 View on Twitter
               </a>
               
               <div>
-                <button onclick="location.href='/'">🏠 Voltar ao Início</button>
-                <button onclick="location.href='/tweet'">✍️ Fazer Outro Tweet</button>
+                <button onclick="location.href='/'">🏠 Back to Home</button>
+                <button onclick="location.href='/tweet'">✍️ Post Another Tweet</button>
               </div>
             </div>
           </body>
@@ -1098,32 +1085,32 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Tratamento de erro 404
+// 404 error handling
 app.use((req, res) => {
   res.status(404).send(`
-    <h1>404 - Página Não Encontrada</h1>
-    <p>A página que você procura não existe.</p>
-    <button onclick="location.href='/'">Voltar ao Início</button>
+    <h1>404 - Page Not Found</h1>
+    <p>The page you're looking for doesn't exist.</p>
+    <button onclick="location.href='/'">Back to Home</button>
   `);
 });
 
-// Tratamento de erros
+// Error handling
 app.use((error, req, res, next) => {
-  console.error('Erro da aplicação:', error);
+  console.error('Application error:', error);
   res.status(500).send(`
-    <h1>500 - Erro do Servidor</h1>
-    <p>Algo deu errado. Tente novamente mais tarde.</p>
-    <button onclick="location.href='/'">Voltar ao Início</button>
+    <h1>500 - Server Error</h1>
+    <p>Something went wrong. Please try again later.</p>
+    <button onclick="location.href='/'">Back to Home</button>
   `);
 });
 
 // =========================================
-// EXPORT PARA VERCEL
+// EXPORT FOR VERCEL
 // =========================================
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 module.exports = app;
