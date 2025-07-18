@@ -26,7 +26,7 @@
 ## 📂 STEP 2: Copy the Project
 
 ### 2.1 Access the Original Repository
-**Repository link:** [YOUR_LINK_HERE]
+**Repository link:** https://github.com/s00uz/snap-canvas-twitter
 
 ### 2.2 Fork the Project
 1. **Click:** The "Fork" button (top right corner)
