@@ -104,7 +104,7 @@ Make sure your copy contains these files:
 1. **Visit:** https://vercel.com
 2. **Log in** (if not already logged in)
 3. **Click:** "New Project"
-4. **Find:** Your `twitter-oauth-app` repository
+4. **Find:** Your `snap-canvas-twitter` repository
 5. **Click:** "Import"
 
 ### 5.2 Configure Environment Variables
